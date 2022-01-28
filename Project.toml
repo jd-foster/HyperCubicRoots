@@ -1,0 +1,13 @@
+name = "HyperCubicRoots"
+uuid = "f68028e2-f41c-4e8c-9384-4607f7ec68ac"
+authors = ["James Foster <James.Foster@csiro.au> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
