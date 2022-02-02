@@ -33,7 +33,7 @@ test_identity(H,P,bb, tol=100*eps())
 
 # Note: we need to ensure that |z| < 1 in the argument of F
 P(1.01) ≈ H(1.01)  #  isapprox(P(1.01), H(1.01))   false
-# This is done via the Kummer transformation.
+# (This is done via the Kummer transformation in the cubic roots derivation.)
 
 ##
 cc = [-72, -36, 0, 1]
@@ -90,17 +90,18 @@ real_to_tolerance(vec,ϵ) = real.(filter(z -> abs(imag(z)) < ϵ, vec))
 # The trade-off is that the hypergeometric evaluation is about a factor of 2 faster.
 # It may be worth "polishing" the root is greater accuracy is required.
 
-test_cubic_tol = 1e-6 
+test_cubic_tol = 1e-5
 # Notes:
-#  1e-6 is experimentally accurate for Float64 calculations
+#  1e-5 is experimentally accurate for Float64 calculations
 #  1e-15 works for BigFloat calculations, albeit much slower calculations.
 
 test_lead_zero_tol = 1e-8
 # test_lead_zero_tol = big"1e-8"
 test_real_tol = 1e-8
 N_iter = 100_000
-count = 0
+global count = 0
 for i in 1:N_iter
+    global count
     a = rand(-1000:0.01:1000,4)  # randomly generate the coefficients of the cubic.
     # a = rand(big"-1000":0.01:big"1000",4)  # randomly generate the coefficients of the cubic: BigFloat
     if abs(a[4]) < test_cubic_tol
@@ -110,8 +111,8 @@ for i in 1:N_iter
     end
     # fa = Polynomials.Polynomial(a)
     R_hyp = sort(HyperCubicRoots.solve_real_cubic_roots(a,cubic_tol=test_lead_zero_tol))
-    R_num = PolynomialRoots.roots(a)
 
+    R_num = PolynomialRoots.roots(a)
     R_num_real = sort(real_to_tolerance(R_num,test_real_tol))
 
     try
@@ -119,7 +120,8 @@ for i in 1:N_iter
     catch e
         @error e
         println(e)
-        println("a =", a)
+        println("Coefficients: ")
+        println(a)
         println("HyperCubicRoots : R_hyp = ", R_hyp)
         println("PolynomialRoots : R_num = ", R_num_real)
         break
@@ -128,7 +130,8 @@ for i in 1:N_iter
     if mod(i, N_iter ÷ 10)  == 0 || length(R_hyp) == 3
         length(R_hyp) == 3 && count <= 10 ? (count = count + 1) : continue
         println()
-        println("a =", a)
+        println("Coefficients: ")
+        println(a)
         println("HyperCubicRoots:")
         @show(R_hyp)
         println("PolynomialRoots")
@@ -145,9 +148,9 @@ end
 # # We see that the accuray of the root degenerates as the leading coefficient
 # # becomes smaller. Hence we set the accuracy of the method to about 1e-7.
 # TYPE = Float16 # errors due to overflow in calculation.
-TYPE = Float32
+# TYPE = Float32
 TYPE = Float64 
-TYPE = BigFloat
+# TYPE = BigFloat
 for i in 1.0:1:8.0
     x = convert(Vector{TYPE},[-1.,2.1,-3.2,10^-i])
     p = Polynomials.Polynomial(x)
@@ -161,11 +164,13 @@ end
 for i in 1.0:1:10.0
     x = [-1.,34.1,-34.2,10^-i]
     p = Polynomials.Polynomial(x)
-    r = HyperCubicRoots.solve_real_cubic_roots(x, cubic_tol=HyperCubicRoots.CUBIC_ATOL)
+    r = HyperCubicRoots.solve_real_cubic_roots(x, cubic_tol=HyperCubicRoots.CUBIC_ATOL)        
     # r = PolynomialRoots.roots(x)
     # r = PolynomialRoots.solve_cubic_eq(Vector{Complex{Float64}}(x))
     # println(r)
-    println( (i, 10^-i, r[1], p(r[1])))
+    if !isempty(r)
+        println( (i, 10^-i, r[1], p(r[1])))
+    end
 end
 
 ## Timing comparison: 
