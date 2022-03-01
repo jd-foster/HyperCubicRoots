@@ -1,0 +1,25 @@
+
+Paper(s) from which source code implementation is derived:
+  I. J. Zucker, "92.34 The cubic equation – a new look at the irreducible case",
+  The Mathematical Gazette, July 2008, Vol. 92, No. 524 (July 2008), pp. 264-268
+  Published by: The Mathematical Association
+  Stable URL: https://www.jstor.org/stable/27821778
+
+  William M. Faucette, "A Geometric Interpretation of the Solution of the General Quartic Polynomial"
+  The American Mathematical Monthly, Jan. 1996, Vol. 103, No. 1 (Jan., 1996), pp. 51-57
+  Published by: Taylor & Francis, Ltd. on behalf of the Mathematical Association of America
+  Stable URL: https://www.jstor.org/stable/2975214
+
+The authors release the source code derived from the Paper
+under terms of the MIT License or any later version.
+See also file LICENSE attached to the software package.
+
+A custom in the scientific comunity is (regardless of the licence
+you chose to use or distribute this software under)
+that if this code was important in the scientific process or
+for the results of your scientific work, we kindly ask you for the
+appropriate citation of the Paper (Zucker 2008), and
+we would be greatful if you pass the information about
+the proper citation to anyone whom you redistribute this software to.
+     
+
