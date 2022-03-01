@@ -76,9 +76,9 @@ function solve_all_quartic_roots(polycoeff::Vector{T};
         C = sign(q)*sqrt(-gamma)
     elseif isreal(beta) && isreal(gamma)
         A = xsign(alpha)*sqrt(abs(alpha))
-        B = xsign(real(beta))*sqrt(abs(beta))
+        B = xsign(real(beta))*sqrt(abs(real(beta)))
         C_sign = sign(q)/(xsign(alpha)*xsign(real(beta)))
-        C = C_sign*sqrt(abs(gamma))
+        C = C_sign*sqrt(abs(real(gamma)))
     else
         error("Unrecognised case.")
     end

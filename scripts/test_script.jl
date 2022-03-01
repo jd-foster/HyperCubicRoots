@@ -175,6 +175,7 @@ for i in 1.0:1:10.0
 end
 
 ## Timing comparison: 
+# # Cubics:
 trials = 1_000_000
 @time for _ in 1:trials
     a = rand(0.01:0.01:1000.01,4)
@@ -183,6 +184,18 @@ end
 
 @time for _ in 1:trials
     a = rand(-1000:0.01:1000.01,4)
+    R_num = PolynomialRoots.roots(a)
+end
+
+# # Quartics:
+trials = 1_000_000
+@time for _ in 1:trials
+    a = rand(0.01:0.01:1000.01,5)
+    R_hyp = HyperCubicRoots.solve_all_quartic_roots(a; warn_scaling=false)
+end
+
+@time for _ in 1:trials
+    a = rand(-1000:0.01:1000.01,5)
     R_num = PolynomialRoots.roots(a)
 end
 
