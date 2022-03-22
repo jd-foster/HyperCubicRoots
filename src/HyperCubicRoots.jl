@@ -7,7 +7,7 @@ HgF = HypergeometricFunctions._₂F₁
 export HgF,
        solve_real_cubic_roots, solve_all_cubic_roots,
        solve_quadratic_roots,
-       solve_real_quartic_roots, solve_all_quartic_roots
+       solve_all_quartic_roots
 
 # Tolerance to maintain accuracy on the evaluation of the root (p(root) ≈ 0)
 const CUBIC_ATOL = 10.0*sqrt(eps(Float64))
