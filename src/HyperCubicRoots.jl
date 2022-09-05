@@ -13,8 +13,7 @@ export HgF,
 const CUBIC_ATOL = 10.0*sqrt(eps(Float64))
 const QUARTIC_ATOL = 10.0*sqrt(eps(Float64))
 
-poor_conditioning(v, compare_tol) = any(abs.(v) .> compare_tol) ? true : false
-
+include("utils.jl")
 include("quadratic.jl")
 include("cubic.jl")
 include("quartic.jl")

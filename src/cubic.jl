@@ -13,10 +13,7 @@ Note that any higher order coefficients (degree >= 4) are ignored.
 
 Implementation of the real cubic root finding method of Zucker (2008).
 """
-function solve_real_cubic_roots(polycoeff::Vector{T}; 
-    warn_scaling::Bool=true,
-    leading_tol::Float64=CUBIC_ATOL,
-    coeff_tol::Float64=1.0/CUBIC_ATOL) where {T<:Real}
+function solve_real_cubic_roots(polycoeff::Vector{T}) where {T<:Real}
 
     Rts = Vector{Float64}() # object to return with real roots inside.
 
@@ -25,17 +22,11 @@ function solve_real_cubic_roots(polycoeff::Vector{T};
         return Rts
     end
 
-    if warn_scaling && isapprox(polycoeff[4], zero(T), atol=leading_tol)
-        @warn "The leading cubic coefficient is approximately zero. Returning empty array."
-        ## TODO?: fall back to solving a quadratic instead
+    if leading_coeff_approx_zero(polycoeff::Vector{T}; leading_tol=eps(Float64(0.0)))
         return Rts
     end
 
     (e, d, c) = polycoeff[1:3]./polycoeff[4]
-    
-    if warn_scaling && poor_conditioning((e,d,c), coeff_tol)
-        @warn "Large coefficients in scaled polynomial. Poor conditioning may occur."
-    end
    
     # We reduce f(x) = e + d*x + c*x^2 + x^3 via x == t - c/3 to
     # the standard transformed form f'(t) = 2q + 3p*t + t^3 :
@@ -63,22 +54,19 @@ function solve_real_cubic_roots(polycoeff::Vector{T};
         append!(Rts, r_hyp .- c/3)
     else
         error("""
-        The computed discriminant is not comparable to 0;
-        it may have a value of NaN or Inf due to numerical overflow.
+        The computed discriminant $(Disc) is not comparable to 0;
+        it may have a value of NaN or Inf due to numerical issues (e.g. overflow).
         """)
     end
 
     return Rts
 end
 
-function solve_all_cubic_roots(polycoeff::Vector{T}; 
-    warn_scaling::Bool=true,
-    leading_tol::Float64=CUBIC_ATOL,
-    coeff_tol::Float64=1.0/CUBIC_ATOL) where {T<:Real}
+function solve_all_cubic_roots(polycoeff::Vector{T}) where {T<:Real}
 
     Rts = Vector{Complex{Float64}}()
 
-    real_roots = solve_real_cubic_roots(polycoeff; warn_scaling, leading_tol, coeff_tol)
+    real_roots = solve_real_cubic_roots(polycoeff)
     append!(Rts, real_roots)
 
     if length(real_roots) == 3
@@ -94,10 +82,10 @@ function solve_all_cubic_roots(polycoeff::Vector{T};
         complex_roots = solve_quadratic_roots([-c0, r*(r + c2), r]) # return type Vector{Complex{Float64}}
         Rts = append!(Rts, complex_roots)
         return Rts
-    else
-        error("Incorrect number of cubic roots returned: $(Rts).")
-        return Rts
     end
+
+    ## Falls through to:
+    error("Incorrect number of cubic roots returned: $(Rts).")
+    return Rts
     
-        
 end

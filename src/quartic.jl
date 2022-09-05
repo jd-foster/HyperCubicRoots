@@ -31,10 +31,7 @@ Note that any higher order coefficients (degree >= 5) are ignored.
 
 Theory described in Faucette (1996).
 """
-function solve_all_quartic_roots(polycoeff::Vector{T}; 
-    warn_scaling::Bool=true,
-    leading_tol::Float64=QUARTIC_ATOL,
-    coeff_tol::Float64=1.0/QUARTIC_ATOL) where {T<:Real}
+function solve_all_quartic_roots(polycoeff::Vector{T}) where {T<:Real}
 
     Rts = Vector{Complex{Float64}}() # object to return with real roots inside.
 
@@ -43,17 +40,11 @@ function solve_all_quartic_roots(polycoeff::Vector{T};
         return Rts
     end
 
-    if warn_scaling && isapprox(polycoeff[5], zero(T), atol=leading_tol)
-        @warn "The leading quartic coefficient is approximately zero. Returning empty array."
-        ## TODO?: fall back to solving a cubic instead?
+    if leading_coeff_approx_zero(polycoeff::Vector{T}, leading_tol=eps(Float64(0.0)))
         return Rts
     end
 
     a = polycoeff[1:4]./polycoeff[5]
-
-    if warn_scaling && poor_conditioning(a, coeff_tol)
-        @warn "Large coefficients in scaled polynomial. Poor conditioning may occur."
-    end
 
     # We reduce p(z) = a1 + a2*z + a3*z^2 + a4*z^3 + z^4 via z == x - a4/4 to
     # the standard transformed form P(x) = r + q*x + p*x^2 + x^4
@@ -65,7 +56,7 @@ function solve_all_quartic_roots(polycoeff::Vector{T};
     # The "resolvent cubic of P(x)" is h(z) = z^3 - 2p*z^2 + (p^2 - 4r)z + q^2.
     # We find it's roots:
     resolvent_coeff = [q^2, p^2 - 4r, -2p, 1]
-    resolvent_roots = solve_all_cubic_roots(resolvent_coeff; warn_scaling, leading_tol, coeff_tol)
+    resolvent_roots = solve_all_cubic_roots(resolvent_coeff)
 
     alpha = convert(T,resolvent_roots[1])  # ensure first root is Real.
     beta, gamma = resolvent_roots[2:3]
