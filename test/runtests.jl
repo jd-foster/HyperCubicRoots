@@ -79,6 +79,10 @@ end
     ## One real root example:
     dd = [81.80, -59.66, -76.47, -64.32]
     @test length(HyperCubicRoots.solve_real_cubic_roots(dd)) == 1
+
+    ## Integer coefficient vector:
+    r = HyperCubicRoots.solve_real_cubic_roots([8, 2, -5, 1])
+    @test all(isapprox.(sort(r), [-1, 2, 4])) == true
 end
 
 @testset "Quartics" begin

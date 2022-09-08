@@ -25,7 +25,7 @@ function xsign(x::R) where {R<:Real}
 end
 
 """
-Return all the real roots of a quartic equation represented as a
+Return all the roots of a quartic equation, represented as a
 vector of real coefficients for terms of increasing degree.
 Note that any higher order coefficients (degree >= 5) are ignored.
 
@@ -58,7 +58,7 @@ function solve_all_quartic_roots(polycoeff::Vector{T}) where {T<:Real}
     resolvent_coeff = [q^2, p^2 - 4r, -2p, 1]
     resolvent_roots = solve_all_cubic_roots(resolvent_coeff)
 
-    alpha = convert(T,resolvent_roots[1])  # ensure first root is Real.
+    alpha = convert(float(T),resolvent_roots[1])  # ensure first root is Real.
     beta, gamma = resolvent_roots[2:3]
     
     if !isreal(beta) && !isreal(gamma) && sign(alpha) == -1.0

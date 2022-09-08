@@ -4,6 +4,12 @@ using HyperCubicRoots
 # import HyperCubicRoots: HyperCubicRoots, HgF, solve_real_cubic_roots, solve_all_cubic_roots
 
 import Polynomials
+
+function polyeval(aa, root)
+    p = Polynomials.Polynomial(aa)
+    return p.(root)
+end
+
 import PolynomialRoots
 
 include("../src/utils.jl")
@@ -137,10 +143,7 @@ for i in 1:N_iter
 
 end
 
-function polyeval(aa, root)
-    p = Polynomials.Polynomial(aa)
-    return p.(root)
-end
+
 
 # # We see that the accuracy of the root degenerates as the leading coefficient
 # # becomes smaller. Hence we set the accuracy of the method to about 1e-7.
@@ -154,6 +157,17 @@ for i in 1.0:1:8.0
     r = HyperCubicRoots.solve_real_cubic_roots(x) #, leading_tol=TYPE(1e-16))
     println( (i, 10^-i, r[1]))
     println(p(r[1]))
+end
+
+TYPE = Float64
+for i in 1.0:1:8.0
+    pc = TYPE[-1.,2.1,-3.2,10^-i]
+    r = HyperCubicRoots.solve_real_cubic_roots(pc)
+    # println("r = ", r[1], typeof(r[1]))
+    y, mu = HyperCubicRoots.horner_evalpoly_run_err_bnd(pc, TYPE(r[1]))
+    println((i, 10^-i, r[1])) #, y, mu))
+    println("Eval = ", y)
+    println("Errb = ", mu)
 end
 
 # # The relative magnitudes of the polynomial coefficients plays a role here.
@@ -315,3 +329,15 @@ for _ in 1:10
         break
     end
 end
+
+## Evaluation:
+# Higham book example: page 96.
+
+p = Polynomials.fromroots(fill(-1,32))
+@assert p(2) == 3^32
+y = p(-1)
+
+y, mu = HyperCubicRoots.horner_evalpoly_run_err_bnd(float.(coeffs(p)), -1.0)
+## Higham book: y = 0.0, mu = 2.4 x 10^-7
+
+y, mu = HyperCubicRoots.horner_evalpoly_run_err_bnd(float.(coeffs(p)), 0.5)

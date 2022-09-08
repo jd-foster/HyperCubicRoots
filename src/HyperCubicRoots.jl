@@ -18,4 +18,6 @@ include("quadratic.jl")
 include("cubic.jl")
 include("quartic.jl")
 
+include("evaluation.jl")
+
 end

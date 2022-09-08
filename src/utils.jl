@@ -1,3 +1,5 @@
+## Utility functions for HyperCubicRoots.jl
+
 poor_conditioning(v, compare_tol) = any(abs.(v) .> compare_tol) ? true : false
 
 function leading_coeff_approx_zero(polycoeff::Vector{T}; leading_tol::Float64=CUBIC_ATOL) where {T<:Real}

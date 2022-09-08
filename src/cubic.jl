@@ -15,14 +15,14 @@ Implementation of the real cubic root finding method of Zucker (2008).
 """
 function solve_real_cubic_roots(polycoeff::Vector{T}) where {T<:Real}
 
-    Rts = Vector{Float64}() # object to return with real roots inside.
+    Rts = Vector{float(T)}() # object to return with real roots inside.
 
     if length(polycoeff) < 4
         @error "There are too few coefficients given."
         return Rts
     end
 
-    if leading_coeff_approx_zero(polycoeff::Vector{T}; leading_tol=eps(Float64(0.0)))
+    if leading_coeff_approx_zero(polycoeff; leading_tol=eps(Float64(0.0)))
         return Rts
     end
 
