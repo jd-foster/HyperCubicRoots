@@ -31,16 +31,16 @@ Note that any higher order coefficients (degree >= 5) are ignored.
 
 Theory described in Faucette (1996).
 """
-function solve_all_quartic_roots(polycoeff::Vector{T}) where {T<:Real}
+function solve_all_quartic_roots(polycoeff::Vector{T}; realroots::Bool=false) where {T<:Real}
 
-    Rts = Vector{Complex{Float64}}() # object to return with real roots inside.
+    Rts = realroots ? Vector{float(T)}() : Vector{Complex{float(T)}}() # object to return with roots inside.
 
     if length(polycoeff) < 5
-        @error "There are too few coefficients given."
+        @error "Too few polynomial coefficients were given as a quartic."
         return Rts
     end
 
-    if leading_coeff_approx_zero(polycoeff::Vector{T}, leading_tol=eps(Float64(0.0)))
+    if leading_coeff_approx_zero(polycoeff, leading_tol=eps(Float64(0.0)))
         return Rts
     end
 
@@ -82,8 +82,13 @@ function solve_all_quartic_roots(polycoeff::Vector{T}) where {T<:Real}
     # # x2 = (-A - B - C)/2
     # # x3 = ( A + B - C)/2
     # # x4 = ( A - B + C)/2
+    
+    Rts = R_res .- a[4]/4
 
-    append!(Rts, R_res .- a[4]/4)
+    if realroots && !all(isreal(Rts))
+        @warn "The `realroots`` flag is `true`, but complex roots were found. Returning complex roots."
+        return convert(Vector{Complex{float(T)}}, Rts)
+    end
 
     return Rts
 end

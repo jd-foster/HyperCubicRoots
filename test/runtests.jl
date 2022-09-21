@@ -106,4 +106,16 @@ end
         @test all(isapprox.(t_r,P_r; atol=comp_tol))
         @test all(isapprox.(t_i,P_i; atol=comp_tol))
     end
+
+    ## Kahan examples: https://people.eecs.berkeley.edu/~wkahan/Math128/5Mar14.pdf
+    roots4 = HyperCubicRoots.solve_all_quartic_roots
+
+    for i in 1:1:3
+        S = 10^i
+        r_apx = [-S, 1/S^2, 1, S] 
+        r_4 = roots4([-1, S^2, -S^2, -1, 1])
+        sort!(r_4); sort!(r_apx);
+        @test all(isapprox.(r_4, r_apx; rtol=0.1))
+    end
+
 end
