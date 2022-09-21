@@ -3,7 +3,7 @@ using HyperCubicRoots
 # Creates HgF as an alias for HypergeometricFunctions._₂F₁
 # import HyperCubicRoots: HyperCubicRoots, HgF, solve_real_cubic_roots, solve_all_cubic_roots
 
-import Polynomials
+using Polynomials: fromroots, coeffs
 
 function polyeval(aa, root)
     p = Polynomials.Polynomial(aa)
@@ -331,8 +331,13 @@ for _ in 1:10
 end
 
 ## Evaluation:
-# Higham book example: page 96.
+rootsReal3 = HyperCubicRoots.solve_real_cubic_roots
+roots3 = HyperCubicRoots.solve_all_cubic_roots
+roots4 = HyperCubicRoots.solve_all_quartic_roots
 
+h_evalpoly_err = HyperCubicRoots.horner_evalpoly_run_err_bnd
+
+# Higham book example: page 96.
 p = Polynomials.fromroots(fill(-1,32))
 @assert p(2) == 3^32
 y = p(-1)
@@ -341,3 +346,45 @@ y, mu = HyperCubicRoots.horner_evalpoly_run_err_bnd(float.(coeffs(p)), -1.0)
 ## Higham book: y = 0.0, mu = 2.4 x 10^-7
 
 y, mu = HyperCubicRoots.horner_evalpoly_run_err_bnd(float.(coeffs(p)), 0.5)
+
+## Kahan examples:
+# https://people.eecs.berkeley.edu/~wkahan/Math128/5Mar14.pdf
+
+# Small and/or repeated roots:
+rr = 1e-7  # rr = 1e-8 produces NaN roots in Float64 precision
+p = Polynomials.fromroots(fill(-rr,3))
+r_hyp = roots3(coeffs(p))
+y, mu = h_evalpoly_err(coeffs(p), real.(r_hyp))
+
+for i in 1:1:3
+    S = 10^i
+    r_apx = [-S, 1/S^2, 1, S] 
+    r_4 = roots4([-1, S^2, -S^2, -1, 1])
+    sort!(r_4); sort!(r_apx);
+    @assert all(isapprox.(r_4, r_apx; rtol=0.1))
+end
+
+S = 10^7
+cf = [-1, S^2, -S^2, -1, 1]
+r_4 = roots4(cf)
+r_apx = [-S, 1/S^2, 1, S] # root approximation
+sort!(r_4)
+sort!(r_apx)
+abserr = (r_4 .- r_apx)
+@assert all(isapprox.(r_4, r_apx; atol=0.01))
+relerr = (r_4 .- r_apx)./r_4
+@assert all(isapprox.(r_4, r_apx; rtol=0.1))
+
+# evalpoly = HyperCubicRoots.horner_evalpoly_run_err_bnd.((cf,), r_4)
+
+## Example: evaluation of root is not zero, but error bound on evaluation is small.
+S = 10^3
+cf = [-1, S^2, -S^2, -1, 1]
+r_4 = roots4(cf)
+HyperCubicRoots.horner_evalpoly_run_err_bnd.((cf,), r_4)
+
+# Same again with BigFloat:
+S = BigFloat(10^4)
+cf = [-1, S^2, -S^2, -1, 1]
+r_4 = roots4(cf)
+HyperCubicRoots.horner_evalpoly_run_err_bnd.((cf,), r_4)
